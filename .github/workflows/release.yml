@@ -34,7 +34,7 @@ jobs:
         echo "VERSION=$VERSION" >> $GITHUB_ENV
         echo "✅ Set VERSION to $VERSION"
     - name: Build
-      run: dotnet build --no-restore InfaktGateway /p:Version=${{ env.VERSION }}
+      run: dotnet build --no-restore InfaktGateway.csproj /p:Version=${{ env.VERSION }}
     - name: Create the package
       run: |
         mkdir -p ./out
