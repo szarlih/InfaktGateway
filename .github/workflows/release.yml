@@ -1,0 +1,43 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET nuget package
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+          fetch-depth: 0  # Ensure full history is fetched
+    - name: Setup .NET env
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - name: Restore dependencies
+      run: dotnet restore InfaktGateway.csproj
+    - name: Install GitVersion
+      run: |
+        dotnet tool install --global GitVersion.Tool
+        echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+    - name: Get Version
+      run: |
+        VERSION=$(dotnet-gitversion /showvariable FullSemVer | tr -d '\r')
+        if [[ -z "$VERSION" ]]; then
+          echo "❌ ERROR: GitVersion did not return a version!" >&2
+          exit 1
+        fi
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "✅ Set VERSION to $VERSION"
+    - name: Build
+      run: dotnet build --no-restore InfaktGateway.csproj /p:Version=${{ env.VERSION }}
+    - name: Create the package
+      run: |
+        mkdir -p ./out
+        dotnet pack --configuration Release ./InfaktGateway.csproj /p:PackageVersion=${{ env.VERSION }} --output ./out
+    - name: Push generated package to GitHub registry
+      run: dotnet nuget push ./out/*.nupkg --skip-duplicate --no-symbols --source https://nuget.pkg.github.com/szarlih/index.json --api-key ${{ secrets.INFAKTGATEWAY_NUGET }}
