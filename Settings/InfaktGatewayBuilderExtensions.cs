@@ -17,6 +17,7 @@ namespace InfaktGateway.Settings
                 throw new ArgumentException("Missing InfaktGateway:ApiUrl in configuration");
             }
 
+            services.AddTransient<AuthorizationHandler>();
             services.AddRefitClient<IInfaktClient>()
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiUrl))
                 .AddHttpMessageHandler<AuthorizationHandler>();
@@ -26,7 +27,6 @@ namespace InfaktGateway.Settings
         public static IApplicationBuilder UseInfaktGatewayEmailInvoiceExtractor(this IApplicationBuilder app)
         {
             var options = app.ApplicationServices.GetRequiredService<IOptions<InfaktGatewayOptions>>();
-            var settings = options.Value;
 
             return app;
         }
