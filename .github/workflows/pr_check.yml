@@ -35,4 +35,3 @@ jobs:
         echo "✅ Set VERSION to $VERSION"
     - name: Build
       run: dotnet build --no-restore InfaktGateway/InfaktGateway.csproj /p:Version=${{ env.VERSION }}
-    - name: Test
