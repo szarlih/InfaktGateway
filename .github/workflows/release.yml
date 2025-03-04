@@ -19,7 +19,7 @@ jobs:
       with:
         dotnet-version: 9.0.x
     - name: Restore dependencies
-      run: dotnet restore InfaktGateway.csproj
+      run: dotnet restore InfaktGateway/InfaktGateway.csproj
     - name: Install GitVersion
       run: |
         dotnet tool install --global GitVersion.Tool
@@ -34,10 +34,10 @@ jobs:
         echo "VERSION=$VERSION" >> $GITHUB_ENV
         echo "✅ Set VERSION to $VERSION"
     - name: Build
-      run: dotnet build --no-restore InfaktGateway.csproj /p:Version=${{ env.VERSION }}
+      run: dotnet build --no-restore InfaktGateway/InfaktGateway.csproj /p:Version=${{ env.VERSION }}
     - name: Create the package
       run: |
         mkdir -p ./out
-        dotnet pack --configuration Release ./InfaktGateway.csproj /p:PackageVersion=${{ env.VERSION }} --output ./out
+        dotnet pack --configuration Release ./InfaktGateway/InfaktGateway.csproj /p:PackageVersion=${{ env.VERSION }} --output ./out
     - name: Push generated package to GitHub registry
       run: dotnet nuget push ./out/*.nupkg --skip-duplicate --no-symbols --source https://nuget.pkg.github.com/szarlih/index.json --api-key ${{ secrets.INFAKTGATEWAY_NUGET }}
