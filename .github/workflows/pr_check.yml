@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  pr_check:
     runs-on: ubuntu-latest
 
     steps:
