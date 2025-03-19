@@ -3,11 +3,11 @@
 
 name: .NET nuget package
 on:
-  push:
+  pull_request:
     branches: [ "main" ]
 
 jobs:
-  build:
+  pr_check:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,9 +35,3 @@ jobs:
         echo "✅ Set VERSION to $VERSION"
     - name: Build
       run: dotnet build --no-restore InfaktGateway/InfaktGateway.csproj /p:Version=${{ env.VERSION }}
-    - name: Create the package
-      run: |
-        mkdir -p ./out
-        dotnet pack --configuration Release ./InfaktGateway/InfaktGateway.csproj /p:PackageVersion=${{ env.VERSION }} --output ./out
-    - name: Push generated package to GitHub registry
-      run: dotnet nuget push ./out/*.nupkg --skip-duplicate --no-symbols --source https://nuget.pkg.github.com/szarlih/index.json --api-key ${{ secrets.INFAKTGATEWAY_NUGET }}
