@@ -15,7 +15,12 @@ public class InfaktApiService : IInfaktApiService
     public ICostDocReference? AddCost(CostUploadDoc costDoc)
     {
         var costFileResponse = _infaktClient.AddCostFile();
-
         return costFileResponse.Entities.FirstOrDefault();
+    }
+
+    public List<ICostDoc> GetCosts()
+    {
+        var costFilesResponse = _infaktClient.GetCostFiles();
+        return costFilesResponse.Entities != null ? costFilesResponse.Entities : new List<ICostDoc>();
     }
 }

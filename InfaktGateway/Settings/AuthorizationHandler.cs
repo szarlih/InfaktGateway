@@ -6,6 +6,7 @@ namespace InfaktGateway.Settings;
 public class AuthorizationHandler : DelegatingHandler
 {
     private readonly InfaktGatewayOptions _options;
+    private readonly string _apiKeyHeader = "X-inFakt-ApiKey";
 
     public AuthorizationHandler(IOptions<InfaktGatewayOptions> options)
     {
@@ -15,12 +16,13 @@ public class AuthorizationHandler : DelegatingHandler
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancelToken)
     {
         HttpRequestHeaders headers = request.Headers;
+        headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-        AuthenticationHeaderValue authHeader = headers.Authorization;
+        var authHeaderExists = headers.TryGetValues(_apiKeyHeader, out IEnumerable<string>? apiKey);
 
-        if (authHeader != null)
+        if (!authHeaderExists)
         {
-            headers.Authorization = new AuthenticationHeaderValue(authHeader.Scheme, _options.ApiKey);
+            headers.Add(_apiKeyHeader, _options.ApiKey);
         }
 
         return await base.SendAsync(request, cancelToken);
